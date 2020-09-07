@@ -38,10 +38,29 @@ class AbstractAnalyzerEventLoop:
 
     def register(
             self,
-            analyzer: codepost_stats.analyzers.abstract.base.BaseAnalyzer,
+            analyzer: typing.Union[codepost_stats.analyzers.abstract.base.BaseAnalyzer, type],
             name: typing.Optional[str] = None,
     ) -> typing.NoReturn:
         self._check_analyzer_pool()
+
+        if type(analyzer) is type:
+            if issubclass(
+                    analyzer,
+                    codepost_stats.analyzers.abstract.base.AbstractAnalyzer
+            ):
+                try:
+                    analyzer = analyzer()
+
+                except TypeError as exc:
+                    raise TypeError(
+                        "provided `analyzer` seems to require initialization parameters",
+                        exc,
+                    )
+            else:
+                raise TypeError(
+                    "provided `analyzer` type is not an `AbstractAnalyzer` type"
+                )
+
         return self._analyzer_pool.register(
             analyzer=analyzer,
             name=name,
