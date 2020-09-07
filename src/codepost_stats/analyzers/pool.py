@@ -26,10 +26,7 @@ class AbstractAnalyzerPool:
         self._registered_analyzers = dict()
 
     def __iter__(self) -> typing.Iterable[codepost_stats.analyzers.abstract.base.BaseAnalyzer]:
-        if self._registered_analyzers is None:
-            self.__init__()
-
-        return self._registered_analyzers.values()
+        return self.values()
 
     def keys(self) -> typing.List[str]:
         if self._registered_analyzers is None:
@@ -41,7 +38,13 @@ class AbstractAnalyzerPool:
         if self._registered_analyzers is None:
             self.__init__()
 
-        return list(self.__iter__())
+        return list(self._registered_analyzers.values())
+
+    def items(self) -> typing.List[typing.Tuple[str, codepost_stats.analyzers.abstract.base.BaseAnalyzer]]:
+        if self._registered_analyzers is None:
+            self.__init__()
+
+        return list(self._registered_analyzers.items())
 
     def analyzers(self) -> typing.List[codepost_stats.analyzers.abstract.base.BaseAnalyzer]:
         return self.values()

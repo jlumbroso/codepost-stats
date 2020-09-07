@@ -44,6 +44,17 @@ class DictStorageAnalyzer(codepost_stats.analyzers.abstract.base.BaseAnalyzer):
                 )
             )
 
+    @property
+    def names(self) -> typing.List[str]:
+        if self._counters is None:
+            return list()
+
+        return list(set([
+            name
+            for counters in self._counters.values()
+            for name in counters.keys()
+        ]))
+
     def _get_value(self, name: str, subcat: str) -> _DictValueType:
         self._check_subcat(subcat=subcat)
 
@@ -82,8 +93,14 @@ class CounterAnalyzer(DictStorageAnalyzer):
     def subtract(self, name: str, subcat: str, delta: int = 1) -> int:
         return self._delta_counter(name=name, subcat=subcat, delta=-delta)
 
-    def get_by_name(self, name: str) -> typing.Dict[str, int]:
+    def get_by_name(
+            self,
+            name: str,
+            normalize_str: bool = True,
+    ) -> typing.Dict[str, int]:
         record = {}
         for subcat_name, subcat_counters in self._counters.items():
+            if normalize_str:
+                subcat_name = self._normalize_str(subcat_name)
             record[subcat_name] = subcat_counters.get(name, self._initial_value)
         return record

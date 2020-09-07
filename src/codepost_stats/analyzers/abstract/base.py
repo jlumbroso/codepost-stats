@@ -40,6 +40,14 @@ class AbstractAnalyzer:
     def _event_comment(self, *args, **kwargs):
         pass
 
+    def _normalize_str(
+            self,
+            s: str,
+    ) -> str:
+        if s is None:
+            return ""
+        return s.strip().lower().replace(" ", "-")
+
 
 class BaseAnalyzer(AbstractAnalyzer):
 
