@@ -24,7 +24,7 @@ jobs:
           python_version: 3.8.0
           poetry_version: 1.0
           working_directory: "."
-          args: run python -m pytest --cov=codepost-stats --cov-branch tests/
+          args: run python -m pytest --cov=codepost_stats --cov-branch tests/
 
       - name: Run codecov to upload report to site
         uses: abatilo/actions-poetry@v1.5.0
