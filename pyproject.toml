@@ -1,8 +1,39 @@
 [tool.poetry]
 name = "codepost-stats"
-version = "0.1.0"
+version = "0.1.1"
 description = "A system to compile statistics automatically from a course on the codePost platform."
 authors = ["Jérémie Lumbroso <lumbroso@cs.princeton.edu>"]
+license = "LGPL-3.0-or-later"
+readme = "README.md"
+homepage = "https://github.com/jlumbroso/codepost-stats"
+repository = "https://github.com/jlumbroso/codepost-stats"
+include = [
+    "README.md",
+]
+keywords = [
+    "codePost",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = true
+envlist = py{38,39}
+
+[testenv]
+requires =
+    tox-poetry-dev-dependencies
+poetry_add_dev_dependencies = True
+commands =
+    pytest
+"""
 
 [tool.poetry.dependencies]
 python = "^3.8"
