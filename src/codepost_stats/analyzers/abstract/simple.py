@@ -133,12 +133,13 @@ class DictStorageAnalyzer(codepost_stats.analyzers.abstract.base.BaseAnalyzer):
         Gets the value stored for the provided :py:data:`name` and :py:data:`subcat`.
 
         If no value has been stored so far, this will return the value contained in
-        :py:data:`
+        :py:attr:`initial_value`.
 
         :param name: The name identifier
         :param subcat: The subcategory identifier
 
-        :return:
+        :return: The value stored for the :py:data:`name` and :py:data:`subcat` pair
+            if any, or :py:attr:`initial_value`
         """
 
         if not self._check_subcat(subcat=subcat):
@@ -151,12 +152,11 @@ class DictStorageAnalyzer(codepost_stats.analyzers.abstract.base.BaseAnalyzer):
 
     def _set_value(self, name: str, subcat: str, value: _DictValueType) -> typing.NoReturn:
         """
+        Sets the value for the corresponding :py:data:`name` and :py:data:`subcat`.
 
         :param name: The name identifier
         :param subcat: The subcategory identifier
-        :param value: The value to store in the ``name.subcategory`` cell
-
-        :return:
+        :param value: The value to store in the ``name.subcategory`` record
         """
 
         if not self._check_subcat(subcat=subcat):
@@ -173,20 +173,137 @@ class DictStorageAnalyzer(codepost_stats.analyzers.abstract.base.BaseAnalyzer):
 
 
 class CounterAnalyzer(DictStorageAnalyzer):
+    """
+    The :py:class:`CounterAnalyzer` class is a generic class for a codePost
+    analyzer object, that makes it easy to count statistics (number of
+    submissions graded, comments written, etc.).
 
-    _initial_value = 0
+    This class handles all the initialization and provides two methods,
+    :py:func:`add` and :py:func:`subtract`, to update the internal counters.
+
+    Once the analysis is completed, it can be retrieved by iterating over
+    the :py:attr:`names` attribute, to see all the names for which data has
+    been recorded, and for each name, call the :py:func:`get_by_name` function
+    to retrieve the dictionary of values associated with that name (and
+    divided by subcategories).
+
+    This is a high-level analyzer class. The child class
+    :py:class:`codepost_stats.analyzers.standard.SubmissionsGradedCounter`
+    provides an example of how to use this class to count the number of
+    submissions graded.
+    """
+
     _DictValueType = int
+    _initial_value: _DictValueType = 0
+    _default_delta: _DictValueType = 1
 
-    def _delta_counter(self, name: str, subcat: str, delta: _DictValueType = 1) -> _DictValueType:
+    def _delta_counter(
+            self,
+            name: str,
+            subcat: str,
+            delta: _DictValueType = _default_delta,
+    ) -> _DictValueType:
+        """
+        Adjust the counter, for the :py:data:`name` and :py:data:`subcat` record,
+        by relative value :py:data:`delta`.
+
+        :param name: The name identifier
+        :param subcat: The subcategory identifier
+        :param delta: The relative amount by which to adjust the counter
+
+        :raises ValueError: If the subcategory `subcat` does not exist and the
+            subcategory warning is not suppressed
+
+        :return: The new value of the counter that has been modified
+        """
+
         current_value = self._get_value(name=name, subcat=subcat)
         new_value = current_value + delta
         self._set_value(name=name, subcat=subcat, value=new_value)
         return new_value
 
-    def add(self, name: str, subcat: str, delta: _DictValueType = 1) -> _DictValueType:
+    def _check_delta(self, delta: _DictValueType, positivity_check: bool = True):
+
+        # check type of delta
+        try:
+            self._DictValueType(delta)
+        except ValueError:
+            raise ValueError(
+                "The provided `delta` does not have the right type: {}".format(
+                    self._DictValueType
+                ))
+
+        # check "positivity" of delta
+        if positivity_check:
+            try:
+                if delta < 0:
+                    raise ValueError(
+                        "The provided `delta` is not larger or equal to zero; "
+                        "for full control over `delta` use `_delta_counter()` "
+                        "rather than `add` or `subtract`."
+                    )
+            except ValueError:
+                raise
+            except TypeError:
+                # the comparison did not work, so the DictValueType is not
+                # numeric, or does not support comparison with a number
+                pass
+
+    def add(
+            self,
+            name: str,
+            subcat: str,
+            delta: _DictValueType = _default_delta,
+    ) -> _DictValueType:
+        """
+        Adds to the counter, for the :py:data:`name` and :py:data:`subcat` record,
+        by relative nonnegative value :py:data:`delta`.
+
+        This method is implemented by an internal call to :py:func:`_delta_counter`,
+        which is a slightly more powerful method, in particular allowing for
+        arbitrary values of `delta`.
+
+        :param name: The name identifier
+        :param subcat: The subcategory identifier
+        :param delta: (Optionally) the relative amount by which to adjust the counter
+
+        :raises ValueError: If the subcategory `subcat` does not exist and the
+            subcategory warning is not suppressed
+
+        :raises ValueError: If the provided `delta` is negative
+
+        :return: The new value of the counter that has been modified
+        """
+
+        self._check_delta(delta=delta)
         return self._delta_counter(name=name, subcat=subcat, delta=delta)
 
-    def subtract(self, name: str, subcat: str, delta: _DictValueType = 1) -> _DictValueType:
+    def subtract(
+            self,
+            name: str,
+            subcat: str,
+            delta: _DictValueType = _default_delta,
+    ) -> _DictValueType:
+        """
+        Subtracts from the counter, for the :py:data:`name` and :py:data:`subcat`
+        record, by relative nonnegative value :py:data:`delta`.
+
+        This method is implemented by an internal call to :py:func:`_delta_counter`,
+        which is a slightly more powerful method, in particular allowing for
+        arbitrary values of `delta`.
+
+        :param name: The name identifier
+        :param subcat: The subcategory identifier
+        :param delta: (Optionally) the relative amount by which to adjust the counter
+
+        :raises ValueError: If the subcategory `subcat` does not exist and the
+            subcategory warning is not suppressed
+
+        :raises ValueError: If the provided `delta` is negative
+
+        :return: The new value of the counter that has been modified
+        """
+
         return self._delta_counter(name=name, subcat=subcat, delta=-delta)
 
     def get_by_name(
@@ -194,9 +311,26 @@ class CounterAnalyzer(DictStorageAnalyzer):
             name: str,
             normalize_str: bool = True,
     ) -> typing.Dict[str, _DictValueType]:
+        """
+        Returns a dictionary of all the values stored associated with :py:data:`name`.
+
+        :param name: The name identifier of the data to query
+
+        :param normalize_str: (Optional) flag to indicate whether to normalize
+            the names of subcategories, using the internal :py:func:`_normalize_str`
+            normalization function
+
+        :return: A dictionary mapping each subcategory to a counter, for the
+            provided :py:data:`name`
+        """
+
         record = {}
         for subcat_name, subcat_counters in self._counters.items():
+
             if normalize_str:
                 subcat_name = self._normalize_str(subcat_name)
-            record[subcat_name] = subcat_counters.get(name, self._initial_value)
+
+            record[subcat_name] = copy.deepcopy(
+                subcat_counters.get(name, self.initial_value))
+
         return record
