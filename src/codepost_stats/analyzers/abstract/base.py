@@ -2,14 +2,15 @@
 This submodule contains the abstract interfaces for a codePost statistic
 analyzer.
 
-Some generic analyzers are implemented in the related submodule,
+The classes implemented here are the parent classes used to build the generic
+analyzers implemented in the related submodule,
 :py:mod:`codepost_stats.analyzers.abstract.simple`, that serve as building
 blocks for fully implemented analyzers.
 
-Some standard analyzers for typical operations (such as counting the number
-of submissions graded, or the number of comments authored, etc.) are available
-in the :py:mod:`codepost_stats.analyzers.standard` submodule. These can serve
-as examples on how to implement custom analyzers.
+Examples of fully-fledged standard analyzers (to do task such as counting
+the number of submissions graded, or the number of comments authored, etc.),
+are available in the :py:mod:`codepost_stats.analyzers.standard` submodule.
+These can serve as templates illustrating how to implement custom analyzers.
 """
 
 import typing

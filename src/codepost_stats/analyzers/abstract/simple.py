@@ -1,3 +1,22 @@
+"""
+This submodule contains generic analyzer classes that encapsulate common
+functionality related to the kind of data being tracked, and are supposed
+to be overridden to create classes such as :py:class:`SubmissionsGradedCounter`
+in :py:mod:`codepost_stats.analyzers.standard`.
+
+The first generic analyzer is :py:class:`DictStorageAnalyzer`, it is designed
+to record data with two levels of organization, a first level called the
+:py:data:`name` and a second level called the :py:data:`subcat` or subcategory.
+In the above-mentioned example of :py:class:`SubmissionsGradedCounter`, for
+instance, the :py:data:`name` would be the login email of the grader and the
+:py:data:`subcat` would be the names of the assignment.
+
+In fact, because there are many scenarii in which one might want to aggregate
+counts over the codePost data, there is a dedicated generic analyzer for this
+specific purpose, :py:class:`CounterAnalyzer`, which is child class to the
+:py:class:`DictStorageAnalyzer` with an interface specifically designed to keep
+tally with :py:func:`CounterAnalyzer.add` and :py:func:`CounterAnalyzer.subtract`.
+"""
 
 import copy
 import typing
