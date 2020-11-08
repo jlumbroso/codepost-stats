@@ -9,6 +9,7 @@ codepost\_stats.analyzers.abstract.base module
 
 .. automodule:: codepost_stats.analyzers.abstract.base
    :members:
+   :private-members:
    :undoc-members:
    :show-inheritance:
 

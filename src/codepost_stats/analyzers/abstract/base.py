@@ -2,7 +2,7 @@
 This submodule contains the abstract interfaces for a codePost statistic
 analyzer.
 
-Some generic analyzers are then implemented in the related submodule,
+Some generic analyzers are implemented in the related submodule,
 :py:mod:`codepost_stats.analyzers.abstract.simple`, that serve as building
 blocks for fully implemented analyzers.
 
