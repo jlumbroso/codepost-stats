@@ -18,6 +18,9 @@ __all__ = [
 ]
 
 
+SuccessFailurePairType = typing.Tuple[int, int]
+
+
 class AbstractAnalyzerPool:
 
     _registered_analyzers = None
@@ -79,26 +82,76 @@ class AbstractAnalyzerPool:
                 )
             )
 
+    # noinspection PyBroadException
+    def fire_event(
+            self,
+            event_handler_name: str,
+            arguments: typing.Optional[dict] = None,
+    ) -> SuccessFailurePairType:
+
+        # ensure this is a non-None value
+        arguments = arguments or dict()
+
+        # initialize counters
+        success = 0
+        failure = 0
+        notfound = 0
+
+        # trigger event for every analyzer
+
+        for analyzer in self.analyzers():
+
+            # get event handler function
+            try:
+                event_handler = getattr(analyzer, event_handler_name)
+            except AttributeError:
+                notfound += 1
+                continue
+
+            # trigger event handler
+            try:
+                event_handler(**arguments)
+                success += 1
+            except:
+                failure += 1
+
+        # if all failures stem from not found, report this as a separate
+        # type of failure
+
+        if failure == 0 and notfound > 0:
+            raise AttributeError(
+                "attempted to fire an event that exists for none of "
+                "the registered analyzers: Could '{}' be a typo?".format(
+                    event_handler_name,
+                )
+            )
+
+        failure += notfound
+
+        return success, failure
 
 class AnalyzerPool(AbstractAnalyzerPool):
 
-    def fire_event_reset(self):
+    def fire_event_reset(self) -> SuccessFailurePairType:
         success = 0
         failure = 0
+
         for analyzer in self.analyzers():
             try:
                 analyzer._reset()
                 success += 1
             except:
                 failure += 1
-        return (success, failure)
+
+        return success, failure
 
     def fire_event_course(
             self,
             course: codepost.models.courses.Courses,
-    ):
+    ) -> SuccessFailurePairType:
         success = 0
         failure = 0
+
         for analyzer in self.analyzers():
             try:
                 analyzer._event_course(
@@ -107,7 +160,8 @@ class AnalyzerPool(AbstractAnalyzerPool):
                 success += 1
             except:
                 failure += 1
-        return (success, failure)
+
+        return success, failure
 
     def fire_event_assignment(
             self,
