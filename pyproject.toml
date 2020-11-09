@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codepost-stats"
-version = "0.1.1"
+version = "0.1.2"
 description = "A system to compile statistics automatically from a course on the codePost platform."
 authors = ["Jérémie Lumbroso <lumbroso@cs.princeton.edu>"]
 license = "LGPL-3.0-or-later"
