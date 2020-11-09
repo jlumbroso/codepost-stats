@@ -146,9 +146,19 @@ class AbstractAnalyzerPool:
             a subclass of :py:class:`codepost_stats.analyzers.abstract.base.BaseAnalyzer`.
         """
 
+        # no point
+        if analyzer is None:
+            return
+
         # name from the analyzer
         if name is None:
-            name = analyzer.__dict__.get("name")
+            try:
+                name = getattr(analyzer, "name")
+            except AttributeError:
+                name = None
+
+        if name is None:
+            name = analyzer.__dict__.get("_name")
 
         # made up name
         if name is None:
