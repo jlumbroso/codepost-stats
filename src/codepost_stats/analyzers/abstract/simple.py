@@ -245,7 +245,7 @@ class CounterAnalyzer(DictStorageAnalyzer):
 
         # check type of delta
         try:
-            self._DictValueType(delta)
+            delta = self._DictValueType(delta)
         except ValueError:
             raise ValueError(
                 "The provided `delta` does not have the right type: {}".format(
@@ -255,7 +255,7 @@ class CounterAnalyzer(DictStorageAnalyzer):
         # check "positivity" of delta
         if positivity_check:
             try:
-                if delta < 0:
+                if delta < self._DictValueType(0):
                     raise ValueError(
                         "The provided `delta` is not larger or equal to zero; "
                         "for full control over `delta` use `_delta_counter()` "
@@ -263,7 +263,7 @@ class CounterAnalyzer(DictStorageAnalyzer):
                     )
             except ValueError:
                 raise
-            except TypeError:
+            except TypeError:  # pragma: no cover
                 # the comparison did not work, so the DictValueType is not
                 # numeric, or does not support comparison with a number
                 pass

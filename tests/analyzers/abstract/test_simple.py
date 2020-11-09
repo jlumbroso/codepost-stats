@@ -16,6 +16,12 @@ SOME_INITIAL_VALUE_OBJ = list()
 
 SOME_OTHER_VALUE = 20
 
+NUMBER_ZERO_DEFAULT_COUNTER_VALUE = 0
+NUMBER_ONE_DEFAULT_DELTA = 1
+
+BAD_DELTA = "e"
+NEGATIVE_DELTA = -20
+
 SOME_INTERNAL_DICT_DATA = {
     SOME_CATEGORY_NORMALIZED: {
         SOME_NAME_NORMALIZED: SOME_INITIAL_VALUE,
@@ -99,6 +105,11 @@ class TestDictStorageAnalyzer:
         assert type(obj.names) is list
         assert len(obj.names) == 0
 
+        obj._counters = None
+
+        assert type(obj.names) is list
+        assert len(obj.names) == 0
+
     def test_names_dummy(self, obj_with_vals):
         assert len(obj_with_vals.names) > 0
 
@@ -157,3 +168,83 @@ class TestDictStorageAnalyzer:
         )
 
 
+class TestCounterAnalyzer:
+
+    @pytest.fixture()
+    def obj(self):
+        return codepost_stats.analyzers.abstract.simple.CounterAnalyzer()
+
+    @pytest.fixture()
+    def obj_with_vals(self):
+        obj = codepost_stats.analyzers.abstract.simple.CounterAnalyzer()
+        obj._counters = copy.deepcopy(SOME_INTERNAL_DICT_DATA)
+        return obj
+
+    def test_init(self, obj):
+        assert obj._DictValueType is int
+        assert obj._initial_value == NUMBER_ZERO_DEFAULT_COUNTER_VALUE
+        assert obj._default_delta == NUMBER_ONE_DEFAULT_DELTA
+
+    def test_delta_counter(self, obj):
+
+        assert obj._counters is None or len(obj._counters) == 0
+
+        val_one = obj._get_value(
+            name=SOME_NAME_NORMALIZED,
+            subcat=SOME_CATEGORY_NORMALIZED,
+        )
+
+        obj._delta_counter(
+            name=SOME_NAME_NORMALIZED,
+            subcat=SOME_CATEGORY_NORMALIZED,
+            delta=NUMBER_ONE_DEFAULT_DELTA,
+        )
+        assert not (obj._counters is None or len(obj._counters) == 0)
+
+        val_two = obj._get_value(
+            name=SOME_NAME_NORMALIZED,
+            subcat=SOME_CATEGORY_NORMALIZED,
+        )
+
+        assert val_one != val_two
+        assert (val_two - val_one) == NUMBER_ONE_DEFAULT_DELTA
+        assert val_one == NUMBER_ZERO_DEFAULT_COUNTER_VALUE
+        assert val_two == NUMBER_ZERO_DEFAULT_COUNTER_VALUE + NUMBER_ONE_DEFAULT_DELTA
+
+    def test_check_delta(self, obj):
+        with pytest.raises(ValueError):
+            obj._check_delta(delta=BAD_DELTA, positivity_check=True)
+
+        with pytest.raises(ValueError):
+            obj._check_delta(delta=BAD_DELTA, positivity_check=False)
+
+        with pytest.raises(ValueError):
+            obj._check_delta(delta=NEGATIVE_DELTA, positivity_check=True)
+
+        # noinspection PyBroadException
+        try:
+            obj._check_delta(delta=NEGATIVE_DELTA, positivity_check=False)
+            assert True
+        except:
+            assert False
+
+    def test_check_delta_type_error(self, obj):
+        obj._DictValueType = str
+
+
+    def test_add_subtract(self, obj):
+        obj.add(name=SOME_NAME_NORMALIZED, subcat=SOME_CATEGORY_NORMALIZED)
+        obj.subtract(name=SOME_NAME_NORMALIZED, subcat=SOME_CATEGORY_NORMALIZED)
+
+    def test_get_by_name(self, obj, obj_with_vals):
+
+        # empty object
+        assert len(obj.get_by_name(SOME_NAME_NORMALIZED)) == 0
+
+        # non-empty object
+        assert len(obj_with_vals.get_by_name(
+            name=SOME_NAME_NORMALIZED, normalize_str=True)) > 0
+
+        # non-empty object
+        assert len(obj_with_vals.get_by_name(
+            name=SOME_NAME_NORMALIZED, normalize_str=False)) > 0
