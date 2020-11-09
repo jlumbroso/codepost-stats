@@ -83,6 +83,7 @@ class CourseAnalyzerEventLoop(AbstractAnalyzerEventLoop):
     _course_name = None
     _course_term = None
     _course = None
+    _all_names = None
 
     def __init__(
             self,
@@ -169,7 +170,7 @@ class CourseAnalyzerEventLoop(AbstractAnalyzerEventLoop):
 
     @property
     def names(self) -> typing.List[str]:
-        return self._all_names
+        return self._all_names or list()
 
     def get_by_name(
             self,
