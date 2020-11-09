@@ -124,7 +124,7 @@ class AbstractAnalyzer:
     # noinspection PyMethodMayBeStatic
     def _normalize_str(
             self,
-            s: str,
+            s: typing.Optional[str],
     ) -> str:
         """
         Returns a normalized string for purposes of internal string comparisons.
@@ -176,6 +176,7 @@ class BaseAnalyzer(AbstractAnalyzer):
         return self._course
 
     def _reset(self) -> bool:
+        self._course = None
         return True
 
     def _event_course(
