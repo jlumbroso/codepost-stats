@@ -1,3 +1,6 @@
+"""
+
+"""
 
 import typing
 
@@ -23,7 +26,7 @@ SuccessFailurePairType = typing.Tuple[int, int]
 
 class AbstractAnalyzerPool:
 
-    _registered_analyzers = None
+    _registered_analyzers: typing.Optional[typing.Dict[str, codepost_stats.analyzers.abstract.base.BaseAnalyzer]] = None
 
     def __init__(self):
         self._registered_analyzers = dict()
@@ -130,72 +133,42 @@ class AbstractAnalyzerPool:
 
         return success, failure
 
+
 class AnalyzerPool(AbstractAnalyzerPool):
 
     def fire_event_reset(self) -> SuccessFailurePairType:
-        success = 0
-        failure = 0
-
-        for analyzer in self.analyzers():
-            try:
-                analyzer._reset()
-                success += 1
-            except:
-                failure += 1
-
-        return success, failure
+        return self.fire_event(
+            "_reset",
+        )
 
     def fire_event_course(
             self,
             course: codepost.models.courses.Courses,
     ) -> SuccessFailurePairType:
-        success = 0
-        failure = 0
-
-        for analyzer in self.analyzers():
-            try:
-                analyzer._event_course(
-                    course=course,
-                )
-                success += 1
-            except:
-                failure += 1
-
-        return success, failure
+        return self.fire_event(
+            "_event_course", {
+                "course": course,
+            })
 
     def fire_event_assignment(
             self,
             assignment: codepost.models.assignments.Assignments,
     ):
-        success = 0
-        failure = 0
-        for analyzer in self.analyzers():
-            try:
-                analyzer._event_assignment(
-                    assignment=assignment,
-                )
-                success += 1
-            except:
-                failure += 1
-        return (success, failure)
+        return self.fire_event(
+            "_event_assignment", {
+                "assignment": assignment,
+            })
 
     def fire_event_submission(
             self,
             assignment: codepost.models.assignments.Assignments,
             submission: codepost.models.submissions.Submissions,
     ):
-        success = 0
-        failure = 0
-        for analyzer in self.analyzers():
-            try:
-                analyzer._event_submission(
-                    assignment=assignment,
-                    submission=submission,
-                )
-                success += 1
-            except:
-                failure += 1
-        return (success, failure)
+        return self.fire_event(
+            "_event_submission", {
+                "assignment": assignment,
+                "submission": submission,
+            })
 
     def fire_event_file(
             self,
@@ -203,19 +176,12 @@ class AnalyzerPool(AbstractAnalyzerPool):
             submission: codepost.models.submissions.Submissions,
             file: codepost.models.files.Files,
     ):
-        success = 0
-        failure = 0
-        for analyzer in self.analyzers():
-            try:
-                analyzer._event_file(
-                    assignment=assignment,
-                    submission=submission,
-                    file=file,
-                )
-                success += 1
-            except:
-                failure += 1
-        return (success, failure)
+        return self.fire_event(
+            "_event_file", {
+                "assignment": assignment,
+                "submission": submission,
+                "file": file,
+            })
 
     def fire_event_comment(
             self,
@@ -224,17 +190,10 @@ class AnalyzerPool(AbstractAnalyzerPool):
             file: codepost.models.files.Files,
             comment: codepost.models.comments.Comments,
     ):
-        success = 0
-        failure = 0
-        for analyzer in self.analyzers():
-            try:
-                analyzer._event_comment(
-                    assignment=assignment,
-                    submission=submission,
-                    file=file,
-                    comment=comment,
-                )
-                success += 1
-            except:
-                failure += 1
-        return (success, failure)
+        return self.fire_event(
+            "_event_comment", {
+                "assignment": assignment,
+                "submission": submission,
+                "file": file,
+                "comment": comment,
+            })
