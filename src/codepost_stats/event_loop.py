@@ -1,4 +1,5 @@
 
+import builtins
 import typing
 
 import codepost
@@ -43,7 +44,7 @@ class AbstractAnalyzerEventLoop:
     ) -> typing.NoReturn:
         self._check_analyzer_pool()
 
-        if type(analyzer) is type:
+        if type(analyzer) is builtins.type:
             if issubclass(
                     analyzer,
                     codepost_stats.analyzers.abstract.base.AbstractAnalyzer
