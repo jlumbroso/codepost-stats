@@ -12,6 +12,8 @@ SOME_EVENT_HANDLER_NAME = "_reset"
 SOME_ARGUMENTS = {"arg": "blah"}
 SOME_EMPTY_LIST = list()
 
+SOME_ASSIGNMENT_NAME = "Hello"
+
 SOME_COURSE_NAME = "CS101"
 SOME_COURSE_TERM = "F2020"
 
@@ -154,3 +156,29 @@ class TestCourseAnalyzerEventLoop:
         fake_analyzer.get_by_name.assert_called_once()
 
         obj._refresh_all_names()
+
+    def test_run_branches(self, obj, mocker):
+
+        def first_arg(x, *args, **kwargs):
+            return x
+
+        obj._reset_course = lambda: None
+        m = mocker.patch("tqdm.auto.tqdm", side_effect=first_arg)
+
+        comment = mocker.Mock()
+        file = mocker.Mock(comments=[comment])
+        submission = mocker.Mock(files=[file])
+        assignment = mocker.Mock(list_submissions=mocker.Mock(return_value=[submission]))
+        assignments = mocker.Mock(
+            __iter__=mocker.Mock(return_value=iter([SOME_ASSIGNMENT_NAME])),
+            by_name=mocker.Mock(return_value=assignment))
+        course = mocker.Mock(assignments=assignments)
+
+        obj._course = course
+        obj._assignments = [SOME_ASSIGNMENT_NAME]
+
+        obj.run()
+
+        # assert the method has been called twice (assignment + submissions)
+        # (the extra 2 calls is for the last iteration of those loops)
+        assert len(m.mock_calls) == 4
