@@ -71,7 +71,7 @@ pytest-subtests==0.3.2
 python-dateutil==2.8.1
 python-forge==18.6.0; python_version > "3.5"
 pytz==2020.4
-pywin32==228; sys_platform == "win32"
+pywin32==301; sys_platform == "win32"
 pywinpty==0.5.7; os_name == "nt"
 pyyaml==5.3.1
 pyzmq==19.0.2
