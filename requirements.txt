@@ -13,5 +13,5 @@ requests==2.27.1; python_version >= "2.7" and python_full_version < "3.0.0" or p
 six==1.16.0; python_full_version >= "3.6.0"
 tqdm==4.64.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
 typing==3.7.4.3; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
-urllib3==1.26.9; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
+urllib3==1.26.9; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0" and python_version < "4")
 zope.interface==5.4.0; python_full_version >= "3.6.0"
