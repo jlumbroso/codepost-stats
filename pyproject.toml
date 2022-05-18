@@ -19,7 +19,7 @@ license = "LGPL-3.0-or-later"
 name = "codepost-stats"
 readme = "README.md"
 repository = "https://github.com/jlumbroso/codepost-stats"
-version = "0.1.2"
+version = "0.1.3"
 
 [tool.tox]
 legacy_tox_ini = """
@@ -54,6 +54,16 @@ sphinx-autodoc-typehints = "^1.11.1"
 sphinx-rtd-theme = "^0.5.0"
 tox = "^3.20.1"
 tox-poetry-dev-dependencies = "^0.0.5"
+
+# dependabot dependency pins (vulnerability warnings)
+babel = "^2.10.1"
+bleach = "^3.3.0"
+ipython = "^7.31.1"
+jinja2 = "^3.1.2"
+notebook = "^6.4.10"
+py = "^1.11.0"
+pygments = "^2.12.0"
+urllib3 = "^1.26.9"
 
 [build-system]
 build-backend = "poetry.masonry.api"
