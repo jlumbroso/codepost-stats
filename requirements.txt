@@ -1,6 +1,6 @@
 blessings==1.7
 boltons==21.0.0
-certifi==2022.6.15
+certifi==2022.12.7
 charset-normalizer==2.0.12
 codepost==0.2.29
 colorama==0.4.5
