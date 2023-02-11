@@ -58,7 +58,7 @@ tox-poetry-dev-dependencies = "^0.0.5"
 # dependabot dependency pins (vulnerability warnings)
 babel = "^2.10.1"
 bleach = "^3.3.0"
-ipython = "^7.31.1"
+ipython = "^8.10.0"
 jinja2 = "^3.1.2"
 notebook = "^6.4.12"
 py = "^1.11.0"
